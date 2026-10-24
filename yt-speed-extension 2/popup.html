@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>YT Speed & Launch</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    margin: 0;
+    width: 280px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #181818;
+    color: #f1f1f1;
+  }
+  .wrap { padding: 16px; }
+  h1 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 2px 0;
+  }
+  .sub {
+    font-size: 11px;
+    color: #9a9a9e;
+    margin-bottom: 14px;
+  }
+  h2 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #ff4444;
+    margin: 0 0 10px 0;
+  }
+  .section { margin-bottom: 16px; }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .row label { font-size: 13px; }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #4a4a4d;
+    transition: .15s;
+    border-radius: 22px;
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .15s;
+    border-radius: 50%;
+  }
+  input:checked + .slider { background-color: #ff0000; }
+  input:checked + .slider:before { transform: translateX(16px); }
+
+  .mode-toggle {
+    display: flex;
+    background: #262626;
+    border-radius: 8px;
+    padding: 3px;
+    margin-bottom: 14px;
+  }
+  .mode-toggle button {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #b6b6ba;
+    font-size: 12px;
+    padding: 7px 0;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .mode-toggle button.active {
+    background: #ff0000;
+    color: white;
+    font-weight: 600;
+  }
+
+  .field { margin-bottom: 12px; }
+  .field-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #c7c7ca;
+    margin-bottom: 6px;
+  }
+  select, input[type="range"] { width: 100%; }
+  select, input[type="number"] {
+    background: #262626;
+    color: #f1f1f1;
+    border: 1px solid #3a3a3d;
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 13px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .range-pair { display: flex; gap: 10px; }
+  .range-pair .field { flex: 1; margin-bottom: 0; }
+
+  .divider { height: 1px; background: #2c2c2e; margin: 16px 0; }
+
+  .dest-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .dest-toggle button {
+    flex: 1;
+    background: #262626;
+    border: 1px solid #3a3a3d;
+    color: #d0d0d3;
+    font-size: 12px;
+    padding: 8px 0;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .dest-toggle button.active {
+    border-color: #ff0000;
+    color: white;
+    background: #3a1414;
+  }
+
+  .open-now {
+    width: 100%;
+    background: #262626;
+    border: 1px solid #3a3a3d;
+    color: #f1f1f1;
+    font-size: 12px;
+    padding: 8px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  .open-now:hover { border-color: #ff0000; }
+
+  .footer-note {
+    font-size: 10.5px;
+    color: #7a7a7e;
+    line-height: 1.4;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>YT Speed & Launch</h1>
+    <div class="sub">Playback speed control + startup automation</div>
+
+    <div class="section">
+      <h2>Playback speed</h2>
+
+      <div class="row">
+        <label for="speedEnabled">Enable speed control</label>
+        <label class="switch">
+          <input type="checkbox" id="speedEnabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="mode-toggle">
+        <button id="modeFixedBtn" class="active">Fixed</button>
+        <button id="modeRandomBtn">Random</button>
+      </div>
+
+      <div id="fixedField" class="field">
+        <div class="field-label"><span>Speed</span></div>
+        <input type="number" id="fixedSpeed" min="0.05" max="16" step="0.05" value="1" />
+      </div>
+
+      <div id="randomField" class="range-pair" style="display: none;">
+        <div class="field">
+          <div class="field-label"><span>Min</span></div>
+          <input type="number" id="randomMin" min="0.05" max="16" step="0.05" value="0.75" />
+        </div>
+        <div class="field">
+          <div class="field-label"><span>Max</span></div>
+          <input type="number" id="randomMax" min="0.05" max="16" step="0.05" value="1.5" />
+        </div>
+      </div>
+      <div class="footer-note" id="randomNote" style="display: none;">
+        A new random speed is picked each time a video (or Short) starts playing.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <h2>Startup automation</h2>
+
+      <div class="row">
+        <label for="launchEnabled">Auto-open on browser startup</label>
+        <label class="switch">
+          <input type="checkbox" id="launchEnabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="dest-toggle">
+        <button id="destHomeBtn" class="active">Home</button>
+        <button id="destShortsBtn">Shorts</button>
+      </div>
+
+      <button class="open-now" id="openNowBtn">Open this destination now</button>
+      <div class="footer-note">
+        Runs once when the browser itself launches — not on every new tab or window.
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
